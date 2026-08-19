@@ -1,4 +1,9 @@
-# Primary sources
+---
+title: Primary sources
+description: IRS pages, statutes and state registries
+---
+
+{% include nav.html %}
 
 Verify anything load-bearing here before you file. Federal rules are stable;
 state fees and thresholds are not.

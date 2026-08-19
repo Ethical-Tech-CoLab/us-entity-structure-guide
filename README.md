@@ -14,6 +14,8 @@ with the filings, the tax posture and the governance constraints for years.
 > load-bearing against the primary sources in [docs/sources.md](docs/sources.md)
 > before you file.
 
+**Read it as a site:** <https://ethical-tech-colab.github.io/us-entity-structure-guide/>
+
 ## Start here
 
 | If you want to know… | Read |

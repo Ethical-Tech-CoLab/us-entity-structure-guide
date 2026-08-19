@@ -1,4 +1,9 @@
-# Which state?
+---
+title: Which state?
+description: Incorporation vs operation, and the state-by-state trade-offs
+---
+
+{% include nav.html %}
 
 ## The question people get wrong
 

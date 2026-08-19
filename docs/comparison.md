@@ -1,4 +1,9 @@
-# Side-by-side comparison
+---
+title: Side-by-side comparison
+description: The three structures compared, and how each one fails
+---
+
+{% include nav.html %}
 
 ## At a glance
 

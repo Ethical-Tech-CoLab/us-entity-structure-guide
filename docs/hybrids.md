@@ -1,11 +1,16 @@
-# Hybrid and staged structures
+---
+title: Hybrid and staged structures
+description: Fiscal sponsorship, affiliate pairs, subsidiaries, mission-lock
+---
+
+{% include nav.html %}
 
 Most organisations that do research, advocacy and product end up with more than
 one entity. These are the established patterns.
 
 ## Fiscal sponsorship (the bridge)
 
-A existing 501(c)(3) accepts grants and donations on your behalf and passes them
+An existing 501(c)(3) accepts grants and donations on your behalf and passes them
 through, taking a fee (commonly 5–15%). Two flavours:
 
 - **Model A (comprehensive):** the project is legally part of the sponsor; staff

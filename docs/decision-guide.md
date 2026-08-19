@@ -1,4 +1,9 @@
-# Decision guide
+---
+title: Decision guide
+description: Six ordered questions to a structure
+---
+
+{% include nav.html %}
 
 Answer in order. The first "yes" that forces a structure usually wins.
 

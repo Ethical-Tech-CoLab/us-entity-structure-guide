@@ -1,0 +1,14 @@
+title: US Entity Structure Guide
+description: >-
+  501(c)(3), 501(c)(6), or a company? Entity comparison, state-by-state
+  incorporation trade-offs, hybrid structures, and filing costs — for
+  mission-driven technology organisations in the United States.
+theme: jekyll-theme-cayman
+plugins:
+  - jekyll-relative-links
+relative_links:
+  enabled: true
+  collections: false
+show_downloads: false
+exclude:
+  - README.md
