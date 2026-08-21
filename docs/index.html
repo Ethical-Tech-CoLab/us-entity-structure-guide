@@ -1,0 +1,587 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>US Entity Structure Guide — 501(c)(3), 501(c)(6) or a company, and in which state?</title>
+<meta name="description" content="Interactive map and rankings of all 50 states plus DC for forming a 501(c)(3), a 501(c)(6), or a for-profit company — costs, tax posture, charitable registration, and where to get the official information.">
+<link rel="icon" type="image/svg+xml" href="etc-icon.svg">
+<link rel="icon" type="image/png" sizes="256x256" href="etc-icon.png">
+<style>
+:root{
+  --bg:#ffffff; --bg2:#f7f7fb; --bg3:#eef0f7; --fg:#15161c; --fg2:#4a4d5e; --fg3:#767a8c;
+  --line:#e2e4ee; --accent:#6d28d9; --accent2:#a855f7; --accent-soft:#f3ebff;
+  --c3:#6d28d9; --c6:#0f766e; --fp:#b45309;
+  --shadow:0 1px 2px rgba(16,18,40,.06),0 8px 24px rgba(16,18,40,.06);
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root{--bg:#0e0f16;--bg2:#151723;--bg3:#1d2030;--fg:#eef0f8;--fg2:#b3b7c9;--fg3:#8288a0;
+  --line:#282c3e;--accent:#a78bfa;--accent2:#c4b5fd;--accent-soft:#241d3c;
+  --c3:#a78bfa;--c6:#2dd4bf;--fp:#fbbf24;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.35);}
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--fg);
+  font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Helvetica,Arial,sans-serif;
+  font-feature-settings:"kern","liga";}
+.wrap{max-width:1120px;margin:0 auto;padding:0 20px}
+a{color:var(--accent);text-underline-offset:2px}
+h1,h2,h3{line-height:1.2;letter-spacing:-.02em;margin:0}
+h2{font-size:clamp(1.4rem,3vw,1.9rem);margin:0 0 .35rem}
+h3{font-size:1.05rem;margin:0 0 .3rem}
+.sub{color:var(--fg2);max-width:68ch;margin:0 0 1.5rem}
+section{padding:3.5rem 0;border-top:1px solid var(--line)}
+section:first-of-type{border-top:0}
+.eyebrow{font:600 .72rem/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--fg3);margin:0 0 .7rem}
+
+/* header */
+header{background:linear-gradient(150deg,#3b0764,#6d28d9 55%,#7e22ce);color:#fff;padding:3.2rem 0 2.6rem}
+header h1{font-size:clamp(1.8rem,4.6vw,3rem);max-width:20ch}
+header p{color:#e9d5ff;max-width:62ch;margin:.9rem 0 0}
+.hnav{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:1.6rem}
+.hnav a{background:rgba(255,255,255,.13);color:#fff;text-decoration:none;padding:.4rem .8rem;
+  border-radius:999px;font-size:.85rem;border:1px solid rgba(255,255,255,.22)}
+.hnav a:hover{background:rgba(255,255,255,.26)}
+
+/* route cards */
+.routes{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1rem}
+.route{background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:1.2rem;
+  border-top:3px solid var(--k);box-shadow:var(--shadow)}
+.route h3{color:var(--k)}
+.route .tag{font:600 .7rem/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--fg3)}
+.route ul{margin:.7rem 0 0;padding:0;list-style:none;font-size:.9rem}
+.route li{padding:.24rem 0 .24rem 1.3rem;position:relative;color:var(--fg2)}
+.route li::before{position:absolute;left:0;font-weight:700}
+.route li.y::before{content:"+";color:var(--c6)}
+.route li.n::before{content:"−";color:#e11d48}
+@media (prefers-color-scheme:dark){.route li.n::before{color:#fb7185}}
+
+/* controls */
+.chips{display:flex;flex-wrap:wrap;gap:.4rem;margin:0 0 1rem}
+.chip{background:var(--bg2);border:1px solid var(--line);color:var(--fg2);cursor:pointer;
+  padding:.42rem .82rem;border-radius:999px;font-size:.84rem;font-family:inherit;transition:.12s}
+.chip:hover{border-color:var(--accent)}
+.chip[aria-pressed=true]{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+@media (prefers-color-scheme:dark){.chip[aria-pressed=true]{color:#12101d}}
+
+/* map */
+.maprow{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(260px,1fr);gap:1.4rem;align-items:start}
+@media (max-width:900px){.maprow{grid-template-columns:1fr}}
+.mapbox{background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:.6rem;position:relative;box-shadow:var(--shadow)}
+svg#map{width:100%;height:auto;display:block}
+#map path{stroke:var(--bg2);stroke-width:.9;cursor:pointer;transition:fill .18s,opacity .12s}
+#map path:hover{opacity:.72}
+#map path.sel{stroke:var(--fg);stroke-width:2.2}
+#map text{font:600 11px var(--mono);fill:#fff;pointer-events:none;paint-order:stroke;
+  stroke:rgba(0,0,0,.32);stroke-width:2.4px}
+#map .leader{stroke:var(--fg3);stroke-width:.8;fill:none}
+#map .boxlab{font:600 10.5px var(--mono);fill:var(--fg2);stroke:none;text-anchor:start}
+.legend{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin:.7rem .4rem .2rem;font-size:.78rem;color:var(--fg3)}
+.ramp{display:flex;height:11px;border-radius:3px;overflow:hidden;flex:1;min-width:120px}
+.ramp i{flex:1}
+.tip{position:absolute;pointer-events:none;background:var(--fg);color:var(--bg);padding:.4rem .6rem;
+  border-radius:7px;font-size:.78rem;line-height:1.35;opacity:0;transition:opacity .1s;z-index:5;white-space:nowrap}
+
+/* detail panel */
+.panel{background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:1.2rem;
+  position:sticky;top:1rem;box-shadow:var(--shadow)}
+.panel h3{font-size:1.35rem}
+.panel .scores{display:flex;gap:.6rem;margin:.9rem 0}
+.sc{flex:1;background:var(--bg3);border-radius:10px;padding:.6rem .7rem}
+.sc b{display:block;font-size:1.45rem;line-height:1.1;font-family:var(--mono)}
+.sc span{font-size:.7rem;color:var(--fg3);text-transform:uppercase;letter-spacing:.06em}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:.3rem .9rem;font-size:.87rem;margin:.6rem 0}
+.kv dt{color:var(--fg3)}
+.kv dd{margin:0;text-align:right;font-family:var(--mono);font-size:.85rem}
+.quirk{background:var(--accent-soft);border-left:3px solid var(--accent);padding:.6rem .75rem;
+  border-radius:0 8px 8px 0;font-size:.85rem;color:var(--fg2);margin:.8rem 0}
+.srcs{display:flex;flex-direction:column;gap:.35rem;margin-top:.8rem}
+.srcs a{display:flex;justify-content:space-between;gap:.5rem;background:var(--bg3);padding:.5rem .7rem;
+  border-radius:8px;text-decoration:none;font-size:.83rem;color:var(--fg)}
+.srcs a:hover{background:var(--accent);color:#fff}
+.srcs a span{color:var(--fg3);font-size:.75rem}
+.srcs a:hover span{color:#f3e8ff}
+
+/* table */
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:14px;background:var(--bg2)}
+table{border-collapse:collapse;width:100%;font-size:.86rem;min-width:820px}
+th,td{padding:.55rem .7rem;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+th{position:sticky;top:0;background:var(--bg3);cursor:pointer;user-select:none;font-size:.72rem;
+  text-transform:uppercase;letter-spacing:.05em;color:var(--fg2);z-index:2}
+th:hover{color:var(--accent)}
+th[aria-sort]::after{content:" ▾";color:var(--accent)}
+th[aria-sort=ascending]::after{content:" ▴"}
+td:nth-child(2),th:nth-child(2){text-align:left;font-weight:600}
+td:first-child,th:first-child{text-align:center;color:var(--fg3);font-family:var(--mono);width:3rem}
+tbody tr{cursor:pointer}
+tbody tr:hover{background:var(--accent-soft)}
+tbody tr.top td:first-child{color:var(--accent);font-weight:700}
+.num{font-family:var(--mono)}
+.bar{display:inline-block;height:6px;border-radius:3px;background:var(--accent);vertical-align:middle;margin-right:.4rem}
+.pill{display:inline-block;padding:.1rem .45rem;border-radius:5px;font-size:.72rem;font-family:var(--mono)}
+.pill.no{background:#dcfce7;color:#14532d}
+.pill.yes{background:var(--bg3);color:var(--fg3)}
+.pill.limited{background:#fef3c7;color:#78350f}
+@media (prefers-color-scheme:dark){.pill.no{background:#052e16;color:#86efac}.pill.limited{background:#422006;color:#fcd34d}}
+.search{width:100%;max-width:280px;padding:.5rem .8rem;border:1px solid var(--line);border-radius:9px;
+  background:var(--bg2);color:var(--fg);font:inherit;font-size:.88rem;margin-bottom:.8rem}
+
+/* generic content */
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1rem}
+.card{background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:1.1rem}
+.card h3{font-size:.95rem}
+.card p,.card li{font-size:.87rem;color:var(--fg2)}
+.card ul{margin:.5rem 0 0;padding-left:1.1rem}
+.fees{width:100%;min-width:0;font-size:.87rem}
+.fees td:first-child,.fees th:first-child{text-align:left;width:auto;color:var(--fg)}
+.fees td:nth-child(2),.fees th:nth-child(2){text-align:left;font-weight:400}
+.linkgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:.35rem}
+.linkgrid a{background:var(--bg2);border:1px solid var(--line);border-radius:8px;padding:.45rem .65rem;
+  text-decoration:none;font-size:.82rem;color:var(--fg);display:flex;justify-content:space-between;gap:.4rem}
+.linkgrid a:hover{border-color:var(--accent);color:var(--accent)}
+.linkgrid a b{font-family:var(--mono);color:var(--fg3);font-weight:600;font-size:.75rem}
+.note{background:var(--bg2);border:1px solid var(--line);border-left:3px solid var(--accent);
+  border-radius:0 10px 10px 0;padding:.9rem 1.1rem;color:var(--fg2);font-size:.88rem}
+footer{border-top:1px solid var(--line);padding:2rem 0 3rem;color:var(--fg3);font-size:.85rem}
+footer a{color:var(--fg2)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <h1>501(c)(3), 501(c)(6), or a company — and in which state?</h1>
+    <p>An interactive comparison for mission-driven organisations in the United States: what each
+       structure costs you, how all 50 states and DC rank on cost, tax and administrative burden,
+       and exactly where to get the official information.</p>
+    <nav class="hnav">
+      <a href="#structures">Three structures</a>
+      <a href="#map">Map</a>
+      <a href="#rankings">Rankings</a>
+      <a href="#costs">Costs</a>
+      <a href="#where">Where to get it</a>
+      <a href="entity-types.html">Deep dives</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+<section id="structures">
+  <p class="eyebrow">Step one</p>
+  <h2>Pick the structure before you pick the state</h2>
+  <p class="sub">The state changes your costs by a few hundred dollars a year. The structure decides
+     who can fund you, who owns the assets, and whether you may speak about politics. Get this right first.</p>
+  <div class="routes">
+    <div class="route" style="--k:var(--c3)">
+      <p class="tag">Charity</p><h3>501(c)(3)</h3>
+      <ul>
+        <li class="y">Donations are tax-deductible</li>
+        <li class="y">Foundation and government grants</li>
+        <li class="y">Often exempt from state sales and property tax</li>
+        <li class="n">No owners, no equity, assets locked forever</li>
+        <li class="n">Political campaign activity is absolutely prohibited</li>
+        <li class="n">Lobbying capped; Form 990 is public</li>
+        <li class="n">Months to get IRS approval</li>
+      </ul>
+    </div>
+    <div class="route" style="--k:var(--c6)">
+      <p class="tag">Trade body</p><h3>501(c)(6)</h3>
+      <ul>
+        <li class="y">Unlimited lobbying — the main reason to choose it</li>
+        <li class="y">Some political activity permitted</li>
+        <li class="y">No public-support test to pass</li>
+        <li class="y">Members usually deduct dues as a business expense</li>
+        <li class="n">No charitable deduction for donors</li>
+        <li class="n">Foundations effectively cannot fund you</li>
+        <li class="n">Must serve a whole line of business, not one member</li>
+      </ul>
+    </div>
+    <div class="route" style="--k:var(--fp)">
+      <p class="tag">Company</p><h3>For-profit</h3>
+      <ul>
+        <li class="y">Ownership, equity, exit — you keep the upside</li>
+        <li class="y">Incorporate in a day; no IRS application</li>
+        <li class="y">Any revenue, any lobbying, private financials</li>
+        <li class="n">You pay tax</li>
+        <li class="n">No deductible donations, no foundation grants</li>
+        <li class="n">Mission lasts only as long as the cap table allows</li>
+      </ul>
+    </div>
+  </div>
+  <p style="margin-top:1.1rem"><a href="decision-guide.html">→ Six ordered questions that decide it for you</a>
+     &nbsp;·&nbsp; <a href="comparison.html">Full side-by-side</a>
+     &nbsp;·&nbsp; <a href="hybrids.html">Or run two entities</a></p>
+</section>
+
+<section id="map">
+  <p class="eyebrow">Step two</p>
+  <h2>Where to form it</h2>
+  <p class="sub">Colour the map by what you actually care about, then click a state for its numbers and
+     its official filing links. Darker means better on the selected measure.</p>
+  <div class="chips" id="metrics"></div>
+  <div class="maprow">
+    <div class="mapbox">
+      <svg id="map" viewBox="-26 6 1008 608" role="img" aria-label="Map of the United States coloured by the selected measure"></svg>
+      <div class="legend"><span id="lgLo">worse</span><span class="ramp" id="ramp"></span><span id="lgHi">better</span></div>
+      <div class="tip" id="tip"></div>
+    </div>
+    <aside class="panel" id="panel"></aside>
+  </div>
+  <p class="note" style="margin-top:1.2rem"><b>The mistake almost everyone makes.</b> "Where do I incorporate?"
+     matters far less than "where do I operate?" If you form in Delaware but your staff sit in New York, you
+     must also register in New York as a foreign corporation and pay both states, forever. Unless you are
+     raising venture capital, <b>form where your office is</b>. <a href="states.html">Why, in detail →</a></p>
+</section>
+
+<section id="rankings">
+  <p class="eyebrow">Everything, ranked</p>
+  <h2>All 51 jurisdictions</h2>
+  <p class="sub">Click any column to re-rank. Click a row to show it on the map. Scores are computed from the
+     columns shown — the formula is in <a href="#method">Method</a>, and you can disagree with it.</p>
+  <input class="search" id="q" type="search" placeholder="Filter states…" aria-label="Filter states">
+  <div class="tablewrap"><table id="tbl">
+    <thead><tr id="hrow"></tr></thead><tbody id="tb"></tbody>
+  </table></div>
+</section>
+
+<section id="costs">
+  <p class="eyebrow">Money</p>
+  <h2>What it actually costs</h2>
+  <p class="sub">State filing fees are the small number. The recurring compliance costs below are the
+     ones that decide whether the structure is affordable.</p>
+
+  <h3 style="margin-bottom:.6rem">Federal, one-off</h3>
+  <div class="tablewrap" style="margin-bottom:1.6rem"><table class="fees">
+    <thead><tr><th>Step</th><th>Form</th><th>Cost</th><th>Timing</th></tr></thead>
+    <tbody>
+      <tr><td>Employer ID number</td><td>SS-4</td><td>Free</td><td>Same day, online</td></tr>
+      <tr><td>501(c)(3) exemption</td><td>Form 1023</td><td>User fee in the high hundreds</td><td>Several months</td></tr>
+      <tr><td>501(c)(3), small orgs</td><td>Form 1023-EZ</td><td>Lower user fee</td><td>Weeks — limited eligibility</td></tr>
+      <tr><td>501(c)(6) exemption</td><td>Form 1024</td><td>Comparable to 1023</td><td>Months</td></tr>
+      <tr><td>Lobbying election</td><td>Form 5768</td><td>Free</td><td>File it early — cheap insurance</td></tr>
+      <tr><td>For-profit</td><td>—</td><td>No application at all</td><td>Days</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3 style="margin-bottom:.6rem">Recurring, and easy to forget</h3>
+  <div class="cols">
+    <div class="card"><h3>Every year, every entity</h3>
+      <ul>
+        <li>Registered agent, ~$50–$300 per state</li>
+        <li>Annual or biennial report (the table above)</li>
+        <li>Minimum franchise tax where one exists — California's $800 is the notorious one</li>
+        <li>Charitable solicitation renewal in each state you fundraise in</li>
+      </ul></div>
+    <div class="card"><h3>Nonprofit-specific</h3>
+      <ul>
+        <li>Form 990 preparation — the accountant, not the filing, is the cost</li>
+        <li>Independent audit above a state revenue threshold, and most funders want one anyway: five figures</li>
+        <li>D&amp;O insurance — effectively mandatory to recruit a real board</li>
+        <li>Grant accounting with restricted-fund tracking</li>
+      </ul></div>
+    <div class="card"><h3>Realistic first year</h3>
+      <ul>
+        <li>Single-state c3, DIY-heavy: low thousands</li>
+        <li>Single-state c3, lawyer-prepared: $5k–$15k</li>
+        <li>c3 + c6 or c3 + LLC pair: roughly double</li>
+        <li>Delaware C-corp or PBC, qualified at home: $1k–$3k</li>
+      </ul></div>
+  </div>
+  <p style="margin-top:1rem"><a href="costs-and-filings.html">→ Full forms, deadlines and budget breakdown</a></p>
+</section>
+
+<section id="where">
+  <p class="eyebrow">Sources</p>
+  <h2>Where to get the information</h2>
+  <p class="sub">Everything below is a primary source. Use these rather than the summaries on this page
+     when you are about to spend money.</p>
+  <div class="cols" style="margin-bottom:1.6rem">
+    <div class="card"><h3>Federal — IRS</h3><ul>
+      <li><a href="https://www.irs.gov/charities-and-nonprofits">Charities &amp; Nonprofits hub</a></li>
+      <li><a href="https://www.irs.gov/publications/p557">Publication 557 — the manual</a></li>
+      <li><a href="https://www.irs.gov/forms-pubs/about-form-1023">Form 1023</a> ·
+          <a href="https://www.irs.gov/forms-pubs/about-form-1023-ez">1023-EZ</a> ·
+          <a href="https://www.irs.gov/forms-pubs/about-form-1024">1024</a></li>
+      <li><a href="https://www.irs.gov/charities-non-profits/lobbying">Lobbying &amp; campaign rules</a></li>
+      <li><a href="https://apps.irs.gov/app/eos/">Look up any org's 990</a> — read your peers' before you file</li>
+    </ul></div>
+    <div class="card"><h3>Multi-state fundraising</h3><ul>
+      <li><a href="https://www.multistatefiling.org/">Unified Registration Statement</a></li>
+      <li><a href="https://www.councilofnonprofits.org/">Council of Nonprofits</a> — state association directory</li>
+      <li><a href="https://bolderadvocacy.org/">Bolder Advocacy</a> — what a c3 may and may not say</li>
+    </ul></div>
+    <div class="card"><h3>Statutes</h3><ul>
+      <li>26 U.S.C. §§ 501(c)(3), 501(c)(6), 501(h), 170, 162(e), 512–514, 527(f), 4958, 6033(e), 1202</li>
+      <li><a href="https://uscode.house.gov/">uscode.house.gov</a></li>
+      <li><a href="sources.html">Annotated source list →</a></li>
+    </ul></div>
+  </div>
+  <h3 style="margin:0 0 .6rem">Business filing office, by state</h3>
+  <div class="linkgrid" id="sosLinks"></div>
+  <h3 style="margin:1.6rem 0 .6rem">Charity regulator, by state</h3>
+  <div class="linkgrid" id="agLinks"></div>
+</section>
+
+<section id="method">
+  <p class="eyebrow">Method</p>
+  <h2>How the scores are built, and how much to trust them</h2>
+  <div class="cols">
+    <div class="card"><h3>Nonprofit score</h3><p>35% local funder and institutional ecosystem ·
+      25% three-year filing cost · 20% legal and administrative predictability ·
+      20% absence of charitable solicitation registration burden.</p></div>
+    <div class="card"><h3>Company score</h3><p>30% investor familiarity — whether a funding round in this
+      state is routine or a negotiation · 25% legal predictability · 25% three-year cost including minimum
+      franchise tax · 20% personal income tax burden.</p></div>
+    <div class="card"><h3>What is a judgement call</h3><p>The <em>funders</em>, <em>law</em> and
+      <em>investors</em> ratings are editorial, on a 1–5 scale. Everything else is a published fact. Weight them differently and the
+      ranking changes — that is the point of showing the formula.</p></div>
+    <div class="card"><h3>What is indicative</h3><p>Dollar figures are base filing fees for a simple entity,
+      gathered as a planning aid. They exclude expedite fees and change most years. Every state row links to
+      its official fee schedule; check it before you budget.</p></div>
+  </div>
+  <p class="note" style="margin-top:1.2rem"><b>Not legal or tax advice.</b> This is a research summary meant to
+    make you a better client of a lawyer, not a substitute for one. No attorney–client relationship arises from
+    reading it.</p>
+</section>
+
+</main>
+
+<footer><div class="wrap">
+  Maintained by <a href="https://github.com/Ethical-Tech-CoLab">Ethical Tech CoLab</a> ·
+  <a href="https://github.com/Ethical-Tech-CoLab/us-entity-structure-guide">Source &amp; corrections</a> ·
+  Text <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a> ·
+  Boundaries from the US Census Bureau via us-atlas.
+</div></footer>
+
+<script src="assets/us-geo.js"></script>
+<script src="assets/states.js"></script>
+<script>
+(function(){
+"use strict";
+var S = window.STATES, GEO = window.US_GEO;
+var byAb = {}; S.forEach(function(d){ byAb[d.ab] = d; });
+
+/* ---------- derived measures ---------- */
+S.forEach(function(d){
+  d.np3 = d.formNP + d.annualNP * 3;
+  d.fp3 = d.formLLC + (d.annualFP + d.minTax) * 3;
+  d.regBurden = d.charityReg === "no" ? 1 : d.charityReg === "limited" ? 0.6 : 0;
+  d.taxScore = d.pit === "none" ? 1 : d.pit === "flat" ? 0.6 : 0.25;
+});
+function norm(key, invert){
+  var v = S.map(function(d){ return d[key]; });
+  var lo = Math.min.apply(null, v), hi = Math.max.apply(null, v);
+  S.forEach(function(d){
+    var t = hi === lo ? 0.5 : (d[key] - lo) / (hi - lo);
+    d["n_" + key] = invert ? 1 - t : t;
+  });
+}
+norm("np3", true); norm("fp3", true); norm("funders"); norm("law"); norm("investors");
+S.forEach(function(d){
+  d.npScore = Math.round(100 * (0.35*d.n_funders + 0.25*d.n_np3 + 0.20*d.n_law + 0.20*d.regBurden));
+  d.fpScore = Math.round(100 * (0.25*d.n_fp3 + 0.20*d.taxScore + 0.25*d.n_law + 0.30*d.n_investors));
+});
+
+/* ---------- map metrics ---------- */
+var usd = function(n){ return "$" + (n % 1 ? n.toFixed(2) : n.toLocaleString()); };
+var METRICS = [
+  {id:"npScore", label:"Best for a nonprofit", get:function(d){return d.npScore;}, fmt:function(d){return d.npScore + "/100";}, hi:"better"},
+  {id:"fpScore", label:"Best for a company",   get:function(d){return d.fpScore;}, fmt:function(d){return d.fpScore + "/100";}, hi:"better"},
+  {id:"np3",     label:"Nonprofit cost, 3 yrs", get:function(d){return -d.np3;},   fmt:function(d){return usd(d.np3);}, hi:"cheaper"},
+  {id:"fp3",     label:"Company cost, 3 yrs",   get:function(d){return -d.fp3;},   fmt:function(d){return usd(d.fp3);}, hi:"cheaper"},
+  {id:"minTax",  label:"Minimum franchise tax", get:function(d){return -d.minTax;},fmt:function(d){return d.minTax ? usd(d.minTax) + "/yr" : "none";}, hi:"none"},
+  {id:"charityReg", label:"Charity registration", get:function(d){return d.regBurden;},
+     fmt:function(d){return d.charityReg === "no" ? "not required" : d.charityReg === "limited" ? "limited" : "required";}, hi:"not required"},
+  {id:"pit",     label:"Personal income tax", get:function(d){return d.taxScore;},
+     fmt:function(d){return d.pit === "none" ? "none" : d.pit === "flat" ? "flat rate" : "graduated";}, hi:"none"},
+  {id:"funders", label:"Funder ecosystem", get:function(d){return d.funders;}, fmt:function(d){return d.funders + "/5";}, hi:"deepest"},
+  {id:"investors", label:"Investor familiarity", get:function(d){return d.investors;}, fmt:function(d){return d.investors + "/5";}, hi:"most familiar"}
+];
+var metric = METRICS[0], selected = "NY";
+
+/* purple sequential ramp, light->dark */
+var RAMP = ["#f2ecfd","#ddcefa","#c3a6f4","#a77aec","#8b4fe0","#7132cc","#5a1fa8","#43137d"];
+function colorFor(d){
+  var vals = S.map(metric.get);
+  var lo = Math.min.apply(null, vals), hi = Math.max.apply(null, vals);
+  var t = hi === lo ? 0.5 : (metric.get(d) - lo) / (hi - lo);
+  return RAMP[Math.min(RAMP.length - 1, Math.floor(t * RAMP.length))];
+}
+
+/* ---------- build map ---------- */
+var SMALL = ["VT","NH","MA","RI","CT","NJ","DE","MD","DC"];
+var svg = document.getElementById("map"), tip = document.getElementById("tip");
+var NS = "http://www.w3.org/2000/svg";
+function el(n, a){ var e = document.createElementNS(NS, n); for(var k in a) e.setAttribute(k, a[k]); return e; }
+
+var order = Object.keys(GEO.paths).sort();
+order.forEach(function(ab){
+  var p = el("path", {d: GEO.paths[ab], id: "p" + ab});
+  p.addEventListener("mousemove", function(ev){
+    var r = svg.parentNode.getBoundingClientRect();
+    var d = byAb[ab];
+    tip.innerHTML = "<b>" + d.name + "</b><br>" + metric.label + ": " + metric.fmt(d);
+    tip.style.opacity = 1;
+    tip.style.left = Math.min(ev.clientX - r.left + 12, r.width - tip.offsetWidth - 8) + "px";
+    tip.style.top = (ev.clientY - r.top - tip.offsetHeight - 10) + "px";
+  });
+  p.addEventListener("mouseleave", function(){ tip.style.opacity = 0; });
+  p.addEventListener("click", function(){ select(ab); });
+  svg.appendChild(p);
+});
+/* labels for the roomy states */
+order.forEach(function(ab){
+  if (SMALL.indexOf(ab) > -1) return;
+  var c = GEO.centroids[ab]; if (!c) return;
+  var t = el("text", {x: c[0], y: c[1] + 3.5, "text-anchor": "middle"});
+  t.textContent = ab; svg.appendChild(t);
+});
+/* small north-eastern states: leader lines out to a stacked column */
+SMALL.forEach(function(ab, i){
+  var c = GEO.centroids[ab]; if (!c) return;
+  var bx = 946, by = 118 + i * 22;
+  svg.appendChild(el("line", {x1: c[0], y1: c[1], x2: bx - 5, y2: by - 3, "class": "leader"}));
+  var t = el("text", {x: bx, y: by, "class": "boxlab"});
+  t.textContent = ab; svg.appendChild(t);
+});
+
+function paint(){
+  S.forEach(function(d){
+    var p = document.getElementById("p" + d.ab);
+    if (p){ p.setAttribute("fill", colorFor(d)); p.classList.toggle("sel", d.ab === selected); }
+  });
+  document.getElementById("lgHi").textContent = metric.hi;
+}
+
+/* ---------- metric chips ---------- */
+var chipbox = document.getElementById("metrics");
+METRICS.forEach(function(m){
+  var b = document.createElement("button");
+  b.className = "chip"; b.textContent = m.label; b.setAttribute("aria-pressed", m === metric);
+  b.addEventListener("click", function(){
+    metric = m;
+    [].forEach.call(chipbox.children, function(c){ c.setAttribute("aria-pressed", c === b); });
+    paint();
+  });
+  chipbox.appendChild(b);
+});
+document.getElementById("ramp").innerHTML = RAMP.map(function(c){
+  return '<i style="background:' + c + '"></i>';
+}).join("");
+
+/* ---------- detail panel ---------- */
+function select(ab){
+  selected = ab; paint();
+  var d = byAb[ab];
+  var reg = d.charityReg === "no" ? "not required" : d.charityReg === "limited" ? "limited" : "required";
+  document.getElementById("panel").innerHTML =
+    '<h3>' + d.name + '</h3>' +
+    '<div class="scores">' +
+      '<div class="sc"><b>' + d.npScore + '</b><span>Nonprofit</span></div>' +
+      '<div class="sc"><b>' + d.fpScore + '</b><span>Company</span></div>' +
+    '</div>' +
+    '<dl class="kv">' +
+      '<dt>Form a nonprofit</dt><dd>' + usd(d.formNP) + '</dd>' +
+      '<dt>Nonprofit annual</dt><dd>' + (d.annualNP ? usd(d.annualNP) : "none") + '</dd>' +
+      '<dt>Form an LLC</dt><dd>' + usd(d.formLLC) + '</dd>' +
+      '<dt>Form a corporation</dt><dd>' + usd(d.formCorp) + '</dd>' +
+      '<dt>Company annual</dt><dd>' + (d.annualFP ? usd(d.annualFP) : "none") + '</dd>' +
+      '<dt>Minimum tax</dt><dd>' + (d.minTax ? usd(d.minTax) + "/yr" : "none") + '</dd>' +
+      '<dt>Personal income tax</dt><dd>' + (d.pit === "none" ? "none" : d.pit === "flat" ? "flat" : "graduated") + '</dd>' +
+      '<dt>Charity registration</dt><dd>' + reg + '</dd>' +
+      '<dt>Funder ecosystem</dt><dd>' + d.funders + '/5</dd>' +
+      '<dt>Investor familiarity</dt><dd>' + d.investors + '/5</dd>' +
+    '</dl>' +
+    '<p style="font-size:.84rem;color:var(--fg2);margin:.5rem 0">' + d.citNote + '.</p>' +
+    '<div class="quirk"><b>Watch out.</b> ' + d.quirk + '</div>' +
+    '<div class="srcs">' +
+      '<a href="' + d.sos + '">Business filing office<span>official →</span></a>' +
+      '<a href="' + d.ag + '">Charity regulator<span>official →</span></a>' +
+    '</div>';
+}
+
+/* ---------- table ---------- */
+var COLS = [
+  {k:"rank", t:"#"},
+  {k:"name", t:"State", txt:true},
+  {k:"npScore", t:"Nonprofit", bar:true},
+  {k:"fpScore", t:"Company", bar:true},
+  {k:"np3", t:"NP cost 3yr", money:true},
+  {k:"fp3", t:"Co. cost 3yr", money:true},
+  {k:"minTax", t:"Min tax", money:true},
+  {k:"charityReg", t:"Charity reg", pill:true},
+  {k:"pit", t:"Income tax", txt:true},
+  {k:"funders", t:"Funders"},
+  {k:"law", t:"Legal depth"},
+  {k:"investors", t:"Investors"}
+];
+var sortKey = "npScore", asc = false, filter = "";
+var hrow = document.getElementById("hrow");
+COLS.forEach(function(c){
+  var th = document.createElement("th");
+  th.textContent = c.t;
+  if (c.k !== "rank"){
+    th.addEventListener("click", function(){
+      if (sortKey === c.k) asc = !asc;
+      else { sortKey = c.k; asc = (c.k === "np3" || c.k === "fp3" || c.k === "minTax" || c.k === "name"); }
+      draw();
+    });
+  }
+  hrow.appendChild(th);
+});
+function draw(){
+  var rows = S.filter(function(d){
+    return !filter || d.name.toLowerCase().indexOf(filter) > -1 || d.ab.toLowerCase() === filter;
+  }).slice().sort(function(a, b){
+    var x = a[sortKey], y = b[sortKey];
+    if (typeof x === "string") return asc ? x.localeCompare(y) : y.localeCompare(x);
+    return asc ? x - y : y - x;
+  });
+  [].forEach.call(hrow.children, function(th, i){
+    if (COLS[i].k === sortKey) th.setAttribute("aria-sort", asc ? "ascending" : "descending");
+    else th.removeAttribute("aria-sort");
+  });
+  document.getElementById("tb").innerHTML = rows.map(function(d, i){
+    return '<tr data-ab="' + d.ab + '"' + (i < 3 ? ' class="top"' : '') + '>' +
+      '<td>' + (i + 1) + '</td>' +
+      '<td>' + d.name + '</td>' +
+      '<td class="num"><span class="bar" style="width:' + (d.npScore * 0.34) + 'px"></span>' + d.npScore + '</td>' +
+      '<td class="num"><span class="bar" style="width:' + (d.fpScore * 0.34) + 'px"></span>' + d.fpScore + '</td>' +
+      '<td class="num">' + usd(d.np3) + '</td>' +
+      '<td class="num">' + usd(d.fp3) + '</td>' +
+      '<td class="num">' + (d.minTax ? usd(d.minTax) : "—") + '</td>' +
+      '<td><span class="pill ' + d.charityReg + '">' + (d.charityReg === "no" ? "not required" : d.charityReg) + '</span></td>' +
+      '<td>' + (d.pit === "none" ? "none" : d.pit === "flat" ? "flat" : "graduated") + '</td>' +
+      '<td class="num">' + d.funders + '/5</td>' +
+      '<td class="num">' + d.law + '/5</td>' +
+      '<td class="num">' + d.investors + '/5</td>' +
+    '</tr>';
+  }).join("");
+}
+document.getElementById("tb").addEventListener("click", function(ev){
+  var tr = ev.target.closest("tr"); if (!tr) return;
+  select(tr.dataset.ab);
+  document.getElementById("map").scrollIntoView({behavior: "smooth", block: "center"});
+});
+document.getElementById("q").addEventListener("input", function(ev){
+  filter = ev.target.value.trim().toLowerCase(); draw();
+});
+
+/* ---------- source directories ---------- */
+function links(id, key){
+  document.getElementById(id).innerHTML = S.slice().sort(function(a, b){
+    return a.name.localeCompare(b.name);
+  }).map(function(d){
+    return '<a href="' + d[key] + '">' + d.name + '<b>' + d.ab + '</b></a>';
+  }).join("");
+}
+links("sosLinks", "sos"); links("agLinks", "ag");
+
+paint(); select(selected); draw();
+})();
+</script>
+</body>
+</html>
