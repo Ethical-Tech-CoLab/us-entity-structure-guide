@@ -70,14 +70,14 @@ header p{color:#e9d5ff;max-width:62ch;margin:.9rem 0 0}
 .maprow{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(260px,1fr);gap:1.4rem;align-items:start}
 @media (max-width:900px){.maprow{grid-template-columns:1fr}}
 .mapbox{background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:.6rem;position:relative;box-shadow:var(--shadow)}
-svg#map{width:100%;height:auto;display:block}
-#map path{stroke:var(--bg2);stroke-width:.9;cursor:pointer;transition:fill .18s,opacity .12s}
-#map path:hover{opacity:.72}
-#map path.sel{stroke:var(--fg);stroke-width:2.2}
-#map text{font:600 11px var(--mono);fill:#fff;pointer-events:none;paint-order:stroke;
+svg#usmap{width:100%;height:auto;aspect-ratio:1008/608;display:block;overflow:visible}
+#usmap path{stroke:var(--bg2);stroke-width:.9;cursor:pointer;transition:fill .18s,opacity .12s}
+#usmap path:hover{opacity:.72}
+#usmap path.sel{stroke:var(--fg);stroke-width:2.2}
+#usmap text{font:600 11px var(--mono);fill:#fff;pointer-events:none;paint-order:stroke;
   stroke:rgba(0,0,0,.32);stroke-width:2.4px}
-#map .leader{stroke:var(--fg3);stroke-width:.8;fill:none}
-#map .boxlab{font:600 10.5px var(--mono);fill:var(--fg2);stroke:none;text-anchor:start}
+#usmap .leader{stroke:var(--fg3);stroke-width:.8;fill:none}
+#usmap .boxlab{font:600 10.5px var(--mono);fill:var(--fg2);stroke:none;text-anchor:start}
 .legend{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin:.7rem .4rem .2rem;font-size:.78rem;color:var(--fg3)}
 .ramp{display:flex;height:11px;border-radius:3px;overflow:hidden;flex:1;min-width:120px}
 .ramp i{flex:1}
@@ -224,7 +224,7 @@ footer a{color:var(--fg2)}
   <div class="chips" id="metrics"></div>
   <div class="maprow">
     <div class="mapbox">
-      <svg id="map" viewBox="-26 6 1008 608" role="img" aria-label="Map of the United States coloured by the selected measure"></svg>
+      <svg id="usmap" width="1008" height="608" viewBox="-26 6 1008 608" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Map of the United States coloured by the selected measure"></svg>
       <div class="legend"><span id="lgLo">worse</span><span class="ramp" id="ramp"></span><span id="lgHi">better</span></div>
       <div class="tip" id="tip"></div>
     </div>
@@ -413,7 +413,7 @@ function colorFor(d){
 
 /* ---------- build map ---------- */
 var SMALL = ["VT","NH","MA","RI","CT","NJ","DE","MD","DC"];
-var svg = document.getElementById("map"), tip = document.getElementById("tip");
+var svg = document.getElementById("usmap"), tip = document.getElementById("tip");
 var NS = "http://www.w3.org/2000/svg";
 function el(n, a){ var e = document.createElementNS(NS, n); for(var k in a) e.setAttribute(k, a[k]); return e; }
 
@@ -564,7 +564,7 @@ function draw(){
 document.getElementById("tb").addEventListener("click", function(ev){
   var tr = ev.target.closest("tr"); if (!tr) return;
   select(tr.dataset.ab);
-  document.getElementById("map").scrollIntoView({behavior: "smooth", block: "center"});
+  document.getElementById("usmap").scrollIntoView({behavior: "smooth", block: "center"});
 });
 document.getElementById("q").addEventListener("input", function(ev){
   filter = ev.target.value.trim().toLowerCase(); draw();
